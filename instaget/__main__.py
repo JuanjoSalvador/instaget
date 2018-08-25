@@ -13,7 +13,7 @@ def main():
         page  = BeautifulSoup(requests.get(url).text, 'html.parser')
         image = page.find_all('script')
 
-        image = image[2].text.replace("window._sharedData = ", "")
+        image = image[3].text.replace("window._sharedData = ", "")
         image = image.replace(";", "")
 
         image_uri  = json.loads(image)['entry_data']['PostPage'][0]['graphql']['shortcode_media']['display_url']
@@ -22,7 +22,7 @@ def main():
         request.urlretrieve(image_uri, image_file)
     except IndexError:
         print("No URL!")
-    except json.decoder.JSONDecodeError:
+    except ValueError:
         print("Invalid URL")
     except requests.exceptions.MissingSchema:
         print("Invalid URL")
