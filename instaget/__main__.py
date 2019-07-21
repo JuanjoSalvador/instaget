@@ -3,23 +3,24 @@
 import sys
 import json
 import requests
+import click
 from urllib import request
 from bs4 import BeautifulSoup
 
-def main():
+
+@click.command()
+@click.option('--uri', default='', help="Media URI that you want to download")
+@click.option('--output', default=False, help="Output file.")
+def main(uri, output):
     try:
-        url   = sys.argv[1]
+        page   = BeautifulSoup(requests.get(uri).text, 'html.parser')
+        media  = page.find('meta', property='og:image')['content']
 
-        page  = BeautifulSoup(requests.get(url).text, 'html.parser')
-        image = page.find_all('script')
+        if not output:
+            output = media.split("/")[-1]
 
-        image = image[3].text.replace("window._sharedData = ", "")
-        image = image.replace(";", "")
+        request.urlretrieve(media, output)
 
-        image_uri  = json.loads(image)['entry_data']['PostPage'][0]['graphql']['shortcode_media']['display_url']
-        image_file = image_uri.split("/")[-1]
-
-        request.urlretrieve(image_uri, image_file)
     except IndexError:
         print("No URL!")
     except ValueError:
