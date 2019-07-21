@@ -18,6 +18,7 @@ def main(uri, output):
 
         if not output:
             output = media.split("/")[-1]
+            output = output.split("?")[0]
 
         request.urlretrieve(media, output)
 
